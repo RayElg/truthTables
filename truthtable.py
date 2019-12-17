@@ -40,7 +40,7 @@ def genVals(length,spot): #Generates T,F list for initial variables, with intent
         L.append(toPlace)
     return L
 
-def simpleExpression(L): #Parse an expression consisting of a list made only of operators and lists of T/F
+def simpleExpression(L): #Evaluate an expression consisting of a list made only of operators and lists of T/F
     #Eg of L:
     #[[T,F],"AND",[F,F],"OR",[T,T]]
 
@@ -76,8 +76,38 @@ def simpleExpression(L): #Parse an expression consisting of a list made only of 
                 return simpleExpression(adjustedList) #Recurse
 
     
+def expression(L): #Evaluate an expression that may contain parantheses
 
+    #Base case: No parantheses:
+    if "(" not in L:
+        return simpleExpression(L) #No parantheses found, so we run simple expression
 
+    #Non base cases...
+    leftParenIndex = -1 #Index of the right-most left bracket
+    rightParenIndex = -1
+    #Search right to left for open parantheses...
+    for i in range(len(L)-1,0,-1):
+        if L[i] == "(":
+            leftParenIndex = i
+            break
+
+    if leftParenIndex > -1: #If we found a left bracket
+        #Now, starting at where the left bracket is, look for it's corresponding right bracket
+        for i in range(leftParenIndex,len(L)):
+            if L[i] == ")":
+                rightParenIndex = i
+                break
+
+    
+    if rightParenIndex > -1: #If we've found both left and right brackets
+        #Replace left bracket's spot with value of expression inside the brackets...
+        L[leftParenIndex] = simpleExpression(L[leftParenIndex + 1:rightParenIndex])
+
+        #Remove what was previously inside the brackets, plus the right bracket
+        for i in range(rightParenIndex,leftParenIndex,-1):
+            L.pop(i)
+        
+        return expression(L)
 
 import string
 
@@ -96,14 +126,14 @@ def printTable(L,numVars,title): #Prints list of T/F lists, using numVars and ti
                 lineStr = lineStr + "F|"
         print(lineStr)
         lineStr = "|"
-
-#X = genVals(4,1)
-#Y = genVals(4,0)
-
-
+        
 A = genVals(8,2)
 B = genVals(8,1)
 C = genVals(8,0)
-D = simpleExpression([A,"AND",B,"OR",C])
+#D = simpleExpression([A,"AND",B,"OR",C])
+D = expression([A,"AND","(",B,"OR",C,")"])
+printTable([A,B,C,D],3,"A AND (B OR C)")
 
-printTable([A,B,C,D],3,"A AND B OR C TABLE")
+
+
+
