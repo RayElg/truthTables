@@ -111,29 +111,35 @@ def expression(L): #Evaluate an expression that may contain parantheses
 
 import string
 
-def printTable(L,numVars,title): #Prints list of T/F lists, using numVars and title in header
+def printTable(L,title): #Print's list of T/F lists & their names (e.g A,B), uses title in header
     print(title)
-    lineStr = "|" #Each line we'll print will be built using lineStr before printing
-    for i in range(numVars): #ADD VARS TO HEADER
-        lineStr = lineStr + list(string.ascii_uppercase)[i] + "|"
-    print(lineStr + "=|")
     lineStr = "|"
-    for i in range(len(L[0])): #Iterates on T/F list within list of lists
-        for j in L: #Iterates on list of lists
-            if j[i] == True: #Add T or F to the string
+    for i in L: #Go through each name,list pair
+        lineStr = lineStr + i[0] + "|" #Append their labels and dividers to string to be printed
+    print(lineStr) #Print the line
+    for j in range(len(L[0][1])): #Iterate throught the T/F through list
+        lineStr = "|"
+        for i in L:
+            if i[1][j] == True:
                 lineStr = lineStr + "T|"
             else:
                 lineStr = lineStr + "F|"
         print(lineStr)
-        lineStr = "|"
+
         
 A = genVals(8,2)
 B = genVals(8,1)
 C = genVals(8,0)
-#D = simpleExpression([A,"AND",B,"OR",C])
-D = expression([A,"AND","(",B,"OR",C,")"])
-printTable([A,B,C,D],3,"A AND (B OR C)")
+D = expression([A,"AND","NOT","(",B,"OR",C,")"])
+
+varList = [
+["A",A],
+["B",B],
+["C",C],
+["=",D]
+]
 
 
-
+printTable(varList,"A AND NOT (B OR C)")
+            
 
