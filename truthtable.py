@@ -1,3 +1,6 @@
+import re
+import string
+
 def twoVals(x,y,op): #Returns boolean value of (x op y)
     #x,y are booleans
     #op is a string
@@ -26,18 +29,6 @@ def twoTables(X,Y,op): #Returns list of boolean vals of (X op Y):
     L = [] #Where we'll store the list of T,F
     for i in range(len(X)): #Use twoVals over lists
         L.append(twoVals(X[i],Y[i],op))
-    return L
-
-def genVals(length,spot): #Generates T,F list for initial variables, with intention of having all combinations of T,F
-    #Spot 0 (first) will switch from placing T/F every 2^0 over length
-    #Spot one (second) will switch from placing T/F every 2^1 over length
-    #length will be 2^n, where n is number of variables
-    L = [] #Where we'll store the list of T,F
-    toPlace = True #What we'll add to the list
-    for i in range(length): #The length the list needs to be
-        if(i % pow(2,spot)) == 0: #Change what we're placing, based off of how often we should switch(from place)
-            toPlace = not toPlace
-        L.append(toPlace)
     return L
 
 def simpleExpression(L): #Evaluate an expression consisting of a list made only of operators and lists of T/F
@@ -109,15 +100,65 @@ def expression(L): #Evaluate an expression that may contain parantheses
         
         return expression(L)
 
-import string
+def genVals(length,spot): #Generates T,F list for initial variables, with intention of having all combinations of T,F
+    #Spot 0 (first) will switch from placing T/F every 2^0 over length
+    #Spot one (second) will switch from placing T/F every 2^1 over length
+    #length will be 2^n, where n is number of variables
+    L = [] #Where we'll store the list of T,F
+    toPlace = True #What we'll add to the list
+    for i in range(length): #The length the list needs to be
+        if(i % pow(2,spot)) == 0: #Change what we're placing, based off of how often we should switch(from place)
+            toPlace = not toPlace
+        L.append(toPlace)
+    return L
 
-def printTable(L,title): #Print's list of T/F lists & their names (e.g A,B), uses title in header
+def getStrList(string):#Returns a list of strings, can be fed into getVarList()
+    string = re.sub("\("," ( ",string)
+    string = re.sub("\)"," ) ",string)
+    L = string.split()
+    return L
+
+def getFinalList(L):
+    output = [] #What we'll return.
+    #(A list that looks like this:
+    #[
+    #["A",[T,T,F,F]],
+    #["B",[T,F,T,F]]
+    #]
+    
+    #First, count number of variables there are (alphabetic characters...)
+    varNames = [] #List of names(single characters) for variables...
+    for i in L:
+        if (i.isalpha()) & (len(i) == 1): #If i is an alphabetic string of length 1...
+            varNames.append(i)
+    varNames = list(dict.fromkeys(varNames)) #Remove duplicates by converting to and from a dictionary...
+
+    #Generate the first part of the varList: inputs
+    for i in range(len(varNames)):
+        toAppend = []
+        toAppend.append(varNames[i]) #Add the variable name
+        toAppend.append(genVals(2**len(varNames),i)) #Add the proper list of T,F
+        output.append(toAppend)
+
+    #Now go through the original given statement, and replace every label with it's list...
+    for i in range(len(L)):
+        #Search the output we've constructed so far...
+        for j in output:
+            if j[0] == L[i]: #If the term in the given statement matches this label,
+                L[i] = j[1] #Replace this label with a list
+
+    #Finally, evaluate L and append that to the end of our output and return
+    output.append(["=",expression(L)])
+    return output
+                
+
+def printTable(L,title): #Prints list of T/F lists & their names (e.g A,B), uses title in header
     print(title)
     lineStr = "|"
     for i in L: #Go through each name,list pair
         lineStr = lineStr + i[0] + "|" #Append their labels and dividers to string to be printed
     print(lineStr) #Print the line
-    for j in range(len(L[0][1])): #Iterate throught the T/F through list
+    for j in range(len(L[0][1])): #Iterate through the T/F through list
         lineStr = "|"
         for i in L:
             if i[1][j] == True:
@@ -125,21 +166,8 @@ def printTable(L,title): #Print's list of T/F lists & their names (e.g A,B), use
             else:
                 lineStr = lineStr + "F|"
         print(lineStr)
-
         
-A = genVals(8,2)
-B = genVals(8,1)
-C = genVals(8,0)
-D = expression([A,"AND","NOT","(",B,"OR",C,")"])
+printTable(getFinalList(getStrList("A AND NOT(B OR C)")),"A AND NOT(B OR C)")
 
-varList = [
-["A",A],
-["B",B],
-["C",C],
-["=",D]
-]
-
-
-printTable(varList,"A AND NOT (B OR C)")
-            
-
+inputted = input("Enter your statement: ")
+printTable(getFinalList(getStrList(inputted)),inputted)
