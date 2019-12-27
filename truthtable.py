@@ -167,7 +167,7 @@ def printTable(L,title): #Prints list of T/F lists & their names (e.g A,B), uses
                 lineStr = lineStr + "F|"
         print(lineStr)
         
-printTable(getFinalList(getStrList("A AND NOT(B OR C)")),"A AND NOT(B OR C)")
 
 inputted = input("Enter your statement: ")
+inputted = inputted.upper()
 printTable(getFinalList(getStrList(inputted)),inputted)
