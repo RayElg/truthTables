@@ -1,0 +1,30 @@
+<html>
+<head>
+<script src="brython.js"></script>
+<script src="brython_stdlib.js"></script>
+</head>
+<body onload="brython({debug: 1, indexedDB: false})">
+
+<script type="text/python" src="truthtablehtml.py"></script>
+
+<link href="truthtable.css" rel="stylesheet" type="text/css">
+<div class="main">
+<div class="bodydiv">
+<p><strong>Enter boolean expression:</strong></p>
+<p><input id="expression" size="60" type="text" placeholder="A XOR (B AND NOT C)"/></p>
+<p><button id="parseButton" type="button">Parse</button></p>
+<p>&nbsp;</p>
+<p><strong>Truth Table:</strong></p>
+<div id="zone" class="zone"></div>
+</div>
+<div class="footer">
+  <p>Raynor Elgie  -  Truth table generator</p>
+</div>
+</div>
+
+</body>
+</html>
+
+
+
+
