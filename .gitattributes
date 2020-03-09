@@ -1,3 +1,0 @@
-#Don't use .js for purposes of labelling the language
-*.js -linguist-vendored
-#This project was coded in python, and uses Brython js files to run it in html
